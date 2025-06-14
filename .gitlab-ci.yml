@@ -1,0 +1,51 @@
+image: golang:1.21
+
+variables:
+  GOPATH: $CI_PROJECT_DIR/.go
+  GO111MODULE: on
+
+stages:
+  - test
+  - lint
+  - build
+  - release
+
+test:
+  stage: test
+  script:
+    - go mod download
+    - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+  coverage: '/coverage: \d+\.\d+% of statements/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.txt
+
+lint:
+  stage: lint
+  script:
+    - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
+    - $(go env GOPATH)/bin/golangci-lint run
+
+build:
+  stage: build
+  script:
+    - go build -v ./...
+    - go test -v ./...
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+release:
+  stage: release
+  script:
+    - go build -o templater-linux-amd64 ./cmd/templater
+    - go build -o templater-windows-amd64.exe ./cmd/templater
+    - go build -o templater-darwin-amd64 ./cmd/templater
+  artifacts:
+    paths:
+      - templater-linux-amd64
+      - templater-windows-amd64.exe
+      - templater-darwin-amd64
+  rules:
+    - if: $CI_COMMIT_TAG 

@@ -1,0 +1,5 @@
+defaults:
+  output_dir: "generated"
+  watch_interval: "1s"
+  backup: true
+  language: "en" 

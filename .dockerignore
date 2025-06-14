@@ -1,0 +1,42 @@
+# Version control
+.git
+.gitignore
+.gitlab-ci.yml
+.github
+
+# Build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.txt
+
+# IDE files
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+*.md
+LICENSE
+
+# Test files
+testdata/
+tests/
+
+# Temporary files
+tmp/
+temp/ 

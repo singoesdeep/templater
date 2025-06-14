@@ -1,0 +1,11 @@
+package main
+
+import "fmt"
+
+func {{.FuncName}}() {
+    fmt.Println("{{.Message}}")
+}
+
+func main() {
+    {{.FuncName}}()
+} 
