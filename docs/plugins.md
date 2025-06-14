@@ -22,4 +22,162 @@ To add a new plugin, implement the `Plugin` interface and register it using the 
 
 ## Troubleshooting
 - Ensure the plugin is correctly registered and compiled.
-- Check the console output for any errors related to plugin loading or registration. 
+- Check the console output for any errors related to plugin loading or registration.
+
+# Templater Plugins
+
+Templater supports plugins to extend its functionality. Plugins are Go packages that implement the `templater.Plugin` interface.
+
+## Plugin Interface
+
+A plugin must implement the following interface:
+
+```go
+type Plugin interface {
+    Name() string
+    Description() string
+    Execute(input string) (string, error)
+}
+```
+
+## Example: Uppercase Plugin
+
+Here's a simple example of a plugin that converts text to uppercase:
+
+```go
+package uppercase
+
+import (
+    "strings"
+)
+
+type UppercasePlugin struct{}
+
+func (p *UppercasePlugin) Name() string {
+    return "uppercase"
+}
+
+func (p *UppercasePlugin) Description() string {
+    return "Converts text to uppercase"
+}
+
+func (p *UppercasePlugin) Execute(input string) (string, error) {
+    return strings.ToUpper(input), nil
+}
+
+func New() *UppercasePlugin {
+    return &UppercasePlugin{}
+}
+```
+
+### Usage
+
+1. **Create a new directory for your plugin:**
+
+   ```sh
+   mkdir -p plugins/uppercase
+   cd plugins/uppercase
+   ```
+
+2. **Create a `go.mod` file:**
+
+   ```sh
+   go mod init github.com/singoesdeep/templater/plugins/uppercase
+   ```
+
+3. **Create the plugin file (`uppercase.go`):**
+
+   ```go
+   package uppercase
+
+   import (
+       "strings"
+   )
+
+   type UppercasePlugin struct{}
+
+   func (p *UppercasePlugin) Name() string {
+       return "uppercase"
+   }
+
+   func (p *UppercasePlugin) Description() string {
+       return "Converts text to uppercase"
+   }
+
+   func (p *UppercasePlugin) Execute(input string) (string, error) {
+       return strings.ToUpper(input), nil
+   }
+
+   func New() *UppercasePlugin {
+       return &UppercasePlugin{}
+   }
+   ```
+
+4. **Create a `main.go` file to test the plugin:**
+
+   ```go
+   package main
+
+   import (
+       "fmt"
+       "log"
+
+       "github.com/singoesdeep/templater/plugins/uppercase"
+   )
+
+   func main() {
+       plugin := uppercase.New()
+       result, err := plugin.Execute("hello, world!")
+       if err != nil {
+           log.Fatal(err)
+       }
+       fmt.Println(result) // Output: HELLO, WORLD!
+   }
+   ```
+
+5. **Run the example:**
+
+   ```sh
+   go run main.go
+   ```
+
+## Integrating Plugins with Templater
+
+To use your plugin with Templater, you need to register it in your application. Here's how:
+
+1. **Import your plugin:**
+
+   ```go
+   import (
+       "github.com/singoesdeep/templater/plugins/uppercase"
+   )
+   ```
+
+2. **Register the plugin:**
+
+   ```go
+   func main() {
+       plugin := uppercase.New()
+       templater.RegisterPlugin(plugin)
+   }
+   ```
+
+3. **Use the plugin in your templates:**
+
+   ```go
+   // In your template
+   {{ uppercase "hello, world!" }}
+   ```
+
+## Best Practices
+
+- **Keep plugins simple and focused:** Each plugin should do one thing well.
+- **Handle errors gracefully:** Always return meaningful error messages.
+- **Test your plugins:** Write unit tests to ensure your plugin works as expected.
+- **Document your plugins:** Provide clear documentation and examples.
+
+## Conclusion
+
+Plugins are a powerful way to extend Templater's functionality. By following the `templater.Plugin` interface, you can create custom plugins that integrate seamlessly with Templater.
+
+For more examples and advanced usage, check out the [examples/plugins](examples/plugins) directory in the Templater repository. 

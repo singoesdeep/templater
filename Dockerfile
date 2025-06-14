@@ -1,5 +1,7 @@
+# syntax=docker/dockerfile:1.4
+
 # Build stage
-FROM golang:1.21-alpine AS builder
+FROM golang:1.24.4-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache git
@@ -17,7 +19,7 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o templater ./cmd/templater
+RUN go build -o templater ./cmd/templater
 
 # Final stage
 FROM alpine:latest
@@ -35,7 +37,6 @@ WORKDIR /app
 COPY --from=builder /app/templater /app/templater
 
 # Copy templates and config
-COPY --from=builder /app/templates /app/templates
 COPY --from=builder /app/.templater.yaml /app/.templater.yaml
 
 # Set ownership
@@ -48,8 +49,8 @@ USER templater
 ENV PATH="/app:${PATH}"
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s \
+HEALTHCHECK --interval=30s --timeout=5s \
     CMD templater --version || exit 1
 
 # Default command
-ENTRYPOINT ["templater"] 
+ENTRYPOINT ["/app/templater"] 
