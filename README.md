@@ -1,152 +1,110 @@
-# 🎨 Templater
+# Templater
 
-A powerful, secure, and flexible template processing tool for generating code and text files from templates using Go's text/template engine.
+A powerful template engine that supports multiple file formats including Markdown, HTML, and DOCX.
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/singoesdeep/templater)](https://goreportcard.com/report/github.com/singoesdeep/templater)
-[![GoDoc](https://godoc.org/github.com/singoesdeep/templater?status.svg)](https://godoc.org/github.com/singoesdeep/templater)
-[![License](https://img.shields.io/github/license/singoesdeep/templater)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/singoesdeep/templater)](https://github.com/singoesdeep/templater/releases)
+## Features
 
-## ✨ Features
+- **Multiple Format Support**: Process templates in Markdown, HTML, and DOCX formats
+- **Variable Substitution**: Replace placeholders with actual values
+- **Conditional Logic**: Support for if/else conditions in templates
+- **Loops**: Iterate over arrays and maps
+- **Image Support**: Handle image placeholders in templates
+- **Format Preservation**: Maintain original formatting in DOCX files
 
-- 🚀 **Fast & Efficient**: Process templates in under 100ms for files under 1MB
-- 🔒 **Secure**: Sandboxed environment with dangerous command prevention
-- 📦 **Multiple Formats**: Support for JSON and YAML data sources
-- 🔄 **Watch Mode**: Automatic regeneration on file changes
-- 🎯 **CLI & Library**: Use as a command-line tool or import as a Go library
-- 🐳 **Docker Support**: Ready-to-use Docker image
-- 🔌 **Plugin System**: Extend functionality with custom plugins
-
-## 🚀 Quick Start
-
-### Installation
+## Installation
 
 ```bash
-# Using Go
 go install github.com/singoesdeep/templater@latest
-
-# Using Docker
-docker pull singoesdeep/templater:latest
 ```
+
+## Usage
 
 ### Basic Usage
 
 ```bash
-# Generate output from a template
-templater generate -t template.tmpl -d data.json -o output.go
-
-# Watch for changes
-templater watch -t template.tmpl -d data.json -o output.go
-
-# Process multiple templates
-templater generate-all -t templates/ -d data/ -o output/
+templater process -t template.md -d data.json -o output.md
 ```
 
-### As a Library
+### Command Line Options
 
-```go
-package main
+- `-t, --template`: Template file path (required)
+- `-d, --data`: Data file path (required)
+- `-o, --output`: Output file path (required)
+- `-f, --format`: Output format (markdown, html, or docx)
 
-import (
-    "fmt"
-    "github.com/singoesdeep/templater"
-)
+### Template Syntax
 
-func main() {
-    // Load data
-    data, err := templater.LoadData("data.json")
-    if err != nil {
-        log.Fatal(err)
-    }
+#### Variables
 
-    // Render template
-    result, err := templater.Render("template.tmpl", data)
-    if err != nil {
-        log.Fatal(err)
-    }
+```markdown
+Hello {{name}}!
+```
 
-    fmt.Println(result)
+#### Conditionals
+
+```markdown
+{{if condition}}
+  This will be shown if condition is true
+{{else}}
+  This will be shown if condition is false
+{{end}}
+```
+
+#### Loops
+
+```markdown
+{{range items}}
+  - {{.name}}
+{{end}}
+```
+
+#### Images
+
+```markdown
+![alt text]({{image.placeholder}})
+```
+
+### Data Format
+
+The data file should be in JSON format:
+
+```json
+{
+  "name": "John",
+  "items": [
+    {"name": "Item 1"},
+    {"name": "Item 2"}
+  ],
+  "image": {
+    "placeholder": "/path/to/image.jpg"
+  }
 }
 ```
 
-## 📚 Documentation
+### DOCX Templates
 
-- [Installation Guide](docs/INSTALL.md)
-- [Quick Start Tutorial](docs/QUICKSTART.md)
-- [Template Syntax](docs/TEMPLATE_SYNTAX.md)
-- [CLI Reference](docs/CLI.md)
-- [API Documentation](docs/API.md)
-- [Security Guide](docs/SECURITY.md)
+DOCX templates support all the same features as Markdown templates, with some additional considerations:
 
-## 🔧 Configuration
+1. **Format Preservation**: The engine preserves the original formatting of the DOCX file, including:
+   - Font styles (bold, italic, underline)
+   - Font sizes
+   - Colors
+   - Paragraph formatting
+   - Lists and tables
 
-Create a `.templater.yaml` file in your project root:
+2. **Image Handling**: Images in DOCX templates can be replaced using the same syntax as in Markdown:
+   ```markdown
+   {{image.placeholder}}
+   ```
+   The image will be inserted with a default size of 2x2 inches.
 
-```yaml
-defaults:
-  output_dir: "generated"
-  watch_interval: "1s"
-  backup: true
-  language: "en"
-```
+## License
 
-## 🐳 Docker Usage
+This project is licensed under the MIT License.
 
-```bash
-# Run with Docker
-docker run -v $(pwd)/templates:/app/templates \
-          -v $(pwd)/output:/app/output \
-          singoesdeep/templater generate \
-          -t /app/templates/example.tmpl \
-          -o /app/output/result.go
-```
+## Acknowledgments
 
-## 🔌 Plugin System
-
-Create custom plugins to extend functionality:
-
-```go
-package main
-
-import "github.com/singoesdeep/templater/pkg/templater/plugin"
-
-type MyPlugin struct{}
-
-func (p *MyPlugin) Name() string {
-    return "myplugin"
-}
-
-func (p *MyPlugin) Process(input string) (string, error) {
-    // Process input
-    return input, nil
-}
-
-func main() {
-    plugin := &MyPlugin{}
-    // Register plugin
-}
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Go's text/template](https://pkg.go.dev/text/template)
-- [Cobra](https://github.com/spf13/cobra)
-- [YAML.v3](https://github.com/go-yaml/yaml)
-
-## 📞 Support
-
-- [GitHub Issues](https://github.com/singoesdeep/templater/issues)
-- [Documentation](https://github.com/singoesdeep/templater/tree/main/docs)
-- [Discussions](https://github.com/singoesdeep/templater/discussions)
-
----
-
-Made with ❤️ by Singoesdeep 
+- [gooxml](https://github.com/plutext/gooxml) - Go library for working with Office Open XML (OOXML) files
+- [Cobra](https://github.com/spf13/cobra) - A Commander for modern Go CLI interactions
+- [YAML.v3](https://github.com/go-yaml/yaml) - YAML support for the Go language
+- [Go's text/template](https://pkg.go.dev/text/template) - Go's built-in template engine 
